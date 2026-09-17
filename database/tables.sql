@@ -154,3 +154,15 @@ CREATE TABLE purchase (
     CONSTRAINT fk_purchase_ingredient FOREIGN KEY (ingredient_id)
         REFERENCES ingredient (ingredient_id)
 );
+-- Logs
+CREATE TABLE logs (
+    log_id          NUMBER ,
+    employee_id     NUMBER,
+    action_type     VARCHAR2(50),
+    table_name      VARCHAR2(100),
+    record_id       NUMBER,
+    action_details  VARCHAR2(500),
+    log_date        DATE DEFAULT SYSDATE,
+    CONSTRAINT pk_logs PRIMARY KEY (log_id),
+    CONSTRAINT fk_logs_employee FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
+);
