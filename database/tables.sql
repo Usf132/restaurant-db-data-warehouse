@@ -96,6 +96,7 @@ CREATE TABLE Orders (
     table_id        NUMBER NOT NULL,
     order_date      DATE DEFAULT SYSDATE,
     status          VARCHAR2(20) DEFAULT 'OPEN',
+    TotalAmount NUMBER(10,2) DEFAULT 0,
     CONSTRAINT pk_orders PRIMARY KEY (order_id),
     CONSTRAINT fk_orders_customer FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     CONSTRAINT fk_orders_employee FOREIGN KEY (employee_id) REFERENCES employee(employee_id),
