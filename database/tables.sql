@@ -1,3 +1,5 @@
+-- Customer
+
 CREATE TABLE Customer (
     customer_id     NUMBER, --GENERATED ALWAYS AS IDENTITY
     name            VARCHAR2(100) NOT NULL,
@@ -30,14 +32,43 @@ CREATE TABLE Employee (
     CONSTRAINT pk_employee PRIMARY KEY (employee_id),
     CONSTRAINT chk_salary CHECK (salary > 0)
 );
+-- Menu Category
+
+CREATE TABLE Menu_category (
+    category_id     NUMBER,-- GENERATED ALWAYS AS IDENTITY
+    category_name   VARCHAR2(100) NOT NULL,
+    CONSTRAINT pk_menu_category PRIMARY KEY (category_id),
+    CONSTRAINT uq_category_name UNIQUE (category_name)
+);
+-- Ingredient
+
+CREATE TABLE Ingredient (
+    ingredient_id   NUMBER ,--GENERATED ALWAYS AS IDENTITY
+    name            VARCHAR2(100) NOT NULL,
+    unit            VARCHAR2(20) NOT NULL,
+    qty_in_stock    NUMBER(10,2) DEFAULT 0,
+    CONSTRAINT pk_ingredient PRIMARY KEY (ingredient_id),
+    CONSTRAINT chk_qty_in_stock CHECK (qty_in_stock >= 0)
+);
+-- Supplier
+
+CREATE TABLE Supplier (
+    supplier_id     NUMBER ,--GENERATED ALWAYS AS IDENTITY
+    name            VARCHAR2(100) NOT NULL,
+    contact_person  VARCHAR2(100),
+    phone           VARCHAR2(20),
+    email           VARCHAR2(100) UNIQUE,
+    address         VARCHAR2(200),
+    CONSTRAINT pk_supplier PRIMARY KEY (supplier_id)
+);
 -- Menu Item
 
 CREATE TABLE Menu_item (
-    item_id         NUMBER,-- GENERATED ALWAYS AS IDENTITY
+    menu_item_id         NUMBER,-- GENERATED ALWAYS AS IDENTITY
     name            VARCHAR2(100) NOT NULL,
     category        VARCHAR2(50),
     price           NUMBER(10,2) NOT NULL,
-    CONSTRAINT pk_menu_item PRIMARY KEY (item_id),
+    CONSTRAINT pk_menu_item PRIMARY KEY (menu_item_id),
     CONSTRAINT chk_price CHECK (price > 0)
 );
 -- Reservation
@@ -71,22 +102,71 @@ CREATE TABLE Orders (
     CONSTRAINT fk_orders_table FOREIGN KEY (table_id) REFERENCES restaurant_table(table_id),
     CONSTRAINT chk_order_status CHECK (status IN ('OPEN', 'CLOSED', 'CANCELLED'))
 );
--- Order Details
+-- Order_item
 
-CREATE TABLE Order_details (
-    order_detail_id NUMBER,-- GENERATED ALWAYS AS IDENTITY
+CREATE TABLE Order_item (
+    order_item_id   NUMBER,-- GENERATED ALWAYS AS IDENTITY
     order_id        NUMBER NOT NULL,
-    item_id         NUMBER NOT NULL,
+    menu_item_id    NUMBER NOT NULL,
     quantity        NUMBER NOT NULL,
     unit_price      NUMBER(10,2) NOT NULL,
-    CONSTRAINT pk_order_details PRIMARY KEY (order_detail_id),
-    CONSTRAINT fk_od_order FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
-    CONSTRAINT fk_od_item FOREIGN KEY (item_id) REFERENCES menu_item(item_id),
-    CONSTRAINT chk_quantity CHECK (quantity > 0)
+    CONSTRAINT pk_order_item PRIMARY KEY (order_item_id),
+    CONSTRAINT fk_order_item_order FOREIGN KEY (order_id)
+        REFERENCES orders (order_id) ON DELETE CASCADE,
+    CONSTRAINT fk_order_item_menu_item FOREIGN KEY (menu_item_id)
+        REFERENCES menu_item (menu_item_id),
+    CONSTRAINT chk_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_unit_price CHECK (unit_price > 0)
+);
+--Menu_item_ingredient
+
+CREATE TABLE Menu_item_ingredient (
+    menu_item_id    NUMBER NOT NULL,
+    ingredient_id   NUMBER NOT NULL,
+    qty_required    NUMBER(10,2) NOT NULL,
+    CONSTRAINT pk_menu_item_ingredient PRIMARY KEY (menu_item_id, ingredient_id),
+    CONSTRAINT fk_mii_menu_item FOREIGN KEY (menu_item_id)
+        REFERENCES menu_item (menu_item_id) ON DELETE CASCADE,
+    CONSTRAINT fk_mii_ingredient FOREIGN KEY (ingredient_id)
+        REFERENCES ingredient (ingredient_id),
+    CONSTRAINT chk_qty_required CHECK (qty_required > 0)
+);
+-- Purchase
+
+CREATE TABLE Purchase (
+    purchase_id     NUMBER, --GENERATED ALWAYS AS IDENTITY
+    supplier_id     NUMBER NOT NULL,
+    ingredient_id   NUMBER NOT NULL,
+    quantity        NUMBER(10,2) NOT NULL,
+    unit_cost       NUMBER(10,2) NOT NULL,
+    purchase_date   DATE DEFAULT SYSDATE,
+    CONSTRAINT pk_purchase PRIMARY KEY (purchase_id),
+    CONSTRAINT fk_purchase_supplier FOREIGN KEY (supplier_id)
+        REFERENCES supplier (supplier_id),
+    CONSTRAINT fk_purchase_ingredient FOREIGN KEY (ingredient_id)
+        REFERENCES ingredient (ingredient_id),
+    CONSTRAINT chk_purchase_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_unit_cost CHECK (unit_cost > 0)
+);
+-- Payment
+
+CREATE TABLE Payment (
+    payment_id      NUMBER,-- GENERATED ALWAYS AS IDENTITY
+    order_id        NUMBER NOT NULL,
+    amount          NUMBER(10,2) NOT NULL,
+    method          VARCHAR2(50) NOT NULL,
+    status          VARCHAR2(50) DEFAULT 'Pending',
+    paid_at         TIMESTAMP,
+    CONSTRAINT pk_payment PRIMARY KEY (payment_id),
+    CONSTRAINT fk_payment_order FOREIGN KEY (order_id)
+        REFERENCES orders (order_id) ON DELETE CASCADE,
+    CONSTRAINT chk_amount CHECK (amount > 0),
+    CONSTRAINT chk_payment_method CHECK (method IN ('Cash', 'Card', 'Online')),
+    CONSTRAINT chk_payment_status CHECK (status IN ('Pending', 'Completed', 'Failed'))
 );
 -- Logs
 
-CREATE TABLE logs (
+CREATE TABLE Logs (
     log_id          NUMBER,-- GENERATED ALWAYS AS IDENTITY
     employee_id     NUMBER,
     action_type     VARCHAR2(50),
@@ -97,3 +177,4 @@ CREATE TABLE logs (
     CONSTRAINT pk_logs PRIMARY KEY (log_id),
     CONSTRAINT fk_logs_employee FOREIGN KEY (employee_id) REFERENCES employee(employee_id)
 );
+
