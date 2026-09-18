@@ -1,104 +1,100 @@
 --------------------------------------------------------------------------------
 -- Customer
 --------------------------------------------------------------------------------
-create table customer (
-   customer_id number generated always as identity,
-   name        varchar2(100) not null,
-   phone       varchar2(20),
-   email       varchar2(100),
-   address     varchar2(200),
-   is_active   number(1) default 1 not null,
-   constraint pk_customer primary key ( customer_id ),
-   constraint uq_customer_email unique ( email ),
-   constraint chk_customer_active check ( is_active in ( 0,
-                                                         1 ) )
+CREATE TABLE Customer (
+    customer_id     NUMBER GENERATED ALWAYS AS IDENTITY,
+    name            VARCHAR2(100) NOT NULL,
+    phone           VARCHAR2(20),
+    email           VARCHAR2(100),
+    address         VARCHAR2(200),
+    is_active       NUMBER(1) DEFAULT 1 NOT NULL,
+    CONSTRAINT pk_customer        PRIMARY KEY (customer_id),
+    CONSTRAINT uq_customer_email  UNIQUE (email),
+    CONSTRAINT chk_customer_active CHECK (is_active IN (0, 1))
 );
 
 --------------------------------------------------------------------------------
 -- Restaurant_table
 --------------------------------------------------------------------------------
-create table restaurant_table (
-   table_id     number generated always as identity,
-   table_number number not null,
-   capacity     number not null,
-   location     varchar2(100),
-   constraint pk_restaurant_table primary key ( table_id ),
-   constraint uq_table_number unique ( table_number ),
-   constraint chk_capacity check ( capacity > 0 )
+CREATE TABLE Restaurant_table (
+    table_id        NUMBER GENERATED ALWAYS AS IDENTITY,
+    table_number    NUMBER NOT NULL,
+    capacity        NUMBER NOT NULL,
+    location        VARCHAR2(100),
+    CONSTRAINT pk_restaurant_table PRIMARY KEY (table_id),
+    CONSTRAINT uq_table_number     UNIQUE (table_number),
+    CONSTRAINT chk_capacity        CHECK (capacity > 0)
 );
 
 --------------------------------------------------------------------------------
 -- Employee
 --------------------------------------------------------------------------------
-create table employee (
-   employee_id number generated always as identity,
-   name        varchar2(100) not null,
-   phone       varchar2(20),
-   email       varchar2(100),
-   position    varchar2(50),
-   hire_date   date default sysdate,
-   salary      number(10,2),
-   is_active   number(1) default 1 not null,
-   constraint pk_employee primary key ( employee_id ),
-   constraint uq_employee_email unique ( email ),
-   constraint chk_salary check ( salary > 0 ),
-   constraint chk_employee_active check ( is_active in ( 0,
-                                                         1 ) )
+CREATE TABLE Employee (
+    employee_id     NUMBER GENERATED ALWAYS AS IDENTITY,
+    name            VARCHAR2(100) NOT NULL,
+    phone           VARCHAR2(20),
+    email           VARCHAR2(100),
+    position        VARCHAR2(50),
+    hire_date       DATE DEFAULT SYSDATE,
+    salary          NUMBER(10,2),
+    is_active       NUMBER(1) DEFAULT 1 NOT NULL,
+    CONSTRAINT pk_employee        PRIMARY KEY (employee_id),
+    CONSTRAINT uq_employee_email  UNIQUE (email),
+    CONSTRAINT chk_salary         CHECK (salary > 0),
+    CONSTRAINT chk_employee_active CHECK (is_active IN (0, 1))
 );
 
 --------------------------------------------------------------------------------
 -- Menu_category
 --------------------------------------------------------------------------------
-create table menu_category (
-   category_id   number generated always as identity,
-   category_name varchar2(100) not null,
-   constraint pk_menu_category primary key ( category_id ),
-   constraint uq_category_name unique ( category_name )
+CREATE TABLE Menu_category (
+    category_id     NUMBER GENERATED ALWAYS AS IDENTITY,
+    category_name   VARCHAR2(100) NOT NULL,
+    CONSTRAINT pk_menu_category PRIMARY KEY (category_id),
+    CONSTRAINT uq_category_name UNIQUE (category_name)
 );
 
 --------------------------------------------------------------------------------
 -- Ingredient
 --------------------------------------------------------------------------------
-create table ingredient (
-   ingredient_id number generated always as identity,
-   name          varchar2(100) not null,
-   unit          varchar2(20) not null,
-   qty_in_stock  number(10,2) default 0 not null,
-   constraint pk_ingredient primary key ( ingredient_id ),
-   constraint uq_ingredient_name unique ( name ),
-   constraint chk_qty_in_stock check ( qty_in_stock >= 0 )
+CREATE TABLE Ingredient (
+    ingredient_id   NUMBER GENERATED ALWAYS AS IDENTITY,
+    name            VARCHAR2(100) NOT NULL,
+    unit            VARCHAR2(20) NOT NULL,
+    qty_in_stock    NUMBER(10,2) DEFAULT 0 NOT NULL,
+    CONSTRAINT pk_ingredient      PRIMARY KEY (ingredient_id),
+    CONSTRAINT uq_ingredient_name UNIQUE (name),
+    CONSTRAINT chk_qty_in_stock   CHECK (qty_in_stock >= 0)
 );
 
 --------------------------------------------------------------------------------
 -- Supplier
 --------------------------------------------------------------------------------
-create table supplier (
-   supplier_id    number generated always as identity,
-   name           varchar2(100) not null,
-   contact_person varchar2(100),
-   phone          varchar2(20),
-   email          varchar2(100),
-   address        varchar2(200),
-   constraint pk_supplier primary key ( supplier_id ),
-   constraint uq_supplier_email unique ( email )
+CREATE TABLE Supplier (
+    supplier_id     NUMBER GENERATED ALWAYS AS IDENTITY,
+    name            VARCHAR2(100) NOT NULL,
+    contact_person  VARCHAR2(100),
+    phone           VARCHAR2(20),
+    email           VARCHAR2(100),
+    address         VARCHAR2(200),
+    CONSTRAINT pk_supplier       PRIMARY KEY (supplier_id),
+    CONSTRAINT uq_supplier_email UNIQUE (email)
 );
 
 --------------------------------------------------------------------------------
 -- Menu_item  (category is now a real foreign key to Menu_category)
 --------------------------------------------------------------------------------
-create table menu_item (
-   menu_item_id number generated always as identity,
-   name         varchar2(100) not null,
-   category_id  number not null,
-   price        number(10,2) not null,
-   is_active    number(1) default 1 not null,
-   constraint pk_menu_item primary key ( menu_item_id ),
-   constraint uq_menu_item_name unique ( name ),
-   constraint fk_menu_item_category foreign key ( category_id )
-      references menu_category ( category_id ),
-   constraint chk_price check ( price > 0 ),
-   constraint chk_menu_item_active check ( is_active in ( 0,
-                                                          1 ) )
+CREATE TABLE Menu_item (
+    menu_item_id    NUMBER GENERATED ALWAYS AS IDENTITY,
+    name            VARCHAR2(100) NOT NULL,
+    category_id     NUMBER NOT NULL,
+    price           NUMBER(10,2) NOT NULL,
+    is_active       NUMBER(1) DEFAULT 1 NOT NULL,
+    CONSTRAINT pk_menu_item          PRIMARY KEY (menu_item_id),
+    CONSTRAINT uq_menu_item_name     UNIQUE (name),
+    CONSTRAINT fk_menu_item_category FOREIGN KEY (category_id) REFERENCES Menu_category (category_id),
+    CONSTRAINT chk_price             CHECK (price > 0),
+    CONSTRAINT chk_menu_item_active  CHECK (is_active IN (0, 1))
 );
 
 --------------------------------------------------------------------------------
@@ -107,74 +103,51 @@ create table menu_item (
 --   time pair) so overlap checks are exact. The guest limit is the table's
 --   capacity, enforced by trg_reservation_capacity and CreateReservation.
 --------------------------------------------------------------------------------
-create table reservation (
-   reservation_id    number generated always as identity,
-   customer_id       number not null,
-   table_id          number not null,
-   reservation_start timestamp not null,
-   duration_minutes  number(4) default 90 not null,
-   number_of_guests  number(3) not null,
-   status            varchar2(20) default 'CONFIRMED' not null,
-   constraint pk_reservation primary key ( reservation_id ),
-   constraint fk_res_customer foreign key ( customer_id )
-      references customer ( customer_id ),
-   constraint fk_res_table foreign key ( table_id )
-      references restaurant_table ( table_id ),
-   constraint chk_guests check ( number_of_guests > 0 ),
-   constraint chk_res_duration check ( duration_minutes between 15 and 480 ),
-   constraint chk_reservation_status
-      check ( status in ( 'CONFIRMED',
-                          'CANCELLED',
-                          'COMPLETED' ) )
+CREATE TABLE Reservation (
+    reservation_id      NUMBER GENERATED ALWAYS AS IDENTITY,
+    customer_id         NUMBER NOT NULL,
+    table_id            NUMBER NOT NULL,
+    reservation_start   TIMESTAMP NOT NULL,
+    duration_minutes    NUMBER(4) DEFAULT 90 NOT NULL,
+    number_of_guests    NUMBER(3) NOT NULL,
+    status              VARCHAR2(20) DEFAULT 'CONFIRMED' NOT NULL,
+    CONSTRAINT pk_reservation        PRIMARY KEY (reservation_id),
+    CONSTRAINT fk_res_customer       FOREIGN KEY (customer_id) REFERENCES Customer (customer_id),
+    CONSTRAINT fk_res_table          FOREIGN KEY (table_id)    REFERENCES Restaurant_table (table_id),
+    CONSTRAINT chk_guests            CHECK (number_of_guests > 0),
+    CONSTRAINT chk_res_duration      CHECK (duration_minutes BETWEEN 15 AND 480),
+    CONSTRAINT chk_reservation_status CHECK (status IN ('CONFIRMED', 'CANCELLED', 'COMPLETED'))
 );
 
 -- Database-level backstop against double booking: at most one CONFIRMED
 -- reservation per table per start time. (Overlapping-but-different start times
 -- are caught by CreateReservation, which locks the table row first.)
-create unique index uq_res_active_slot on
-   reservation (
-      case
-         when
-            status
-         = 'CONFIRMED' then
-               table_id
-      end,
-      case
-         when
-            status
-         = 'CONFIRMED' then
-               reservation_start
-      end
-   );
+CREATE UNIQUE INDEX uq_res_active_slot ON Reservation (
+    CASE WHEN status = 'CONFIRMED' THEN table_id END,
+    CASE WHEN status = 'CONFIRMED' THEN reservation_start END
+);
 
 --------------------------------------------------------------------------------
 -- Orders
 --   customer_id is nullable so walk-in guests can be served.
 --   total_amount is maintained by trg_order_total.
 --------------------------------------------------------------------------------
-create table orders (
-   order_id       number generated always as identity,
-   customer_id    number,
-   employee_id    number not null,
-   table_id       number not null,
-   reservation_id number,
-   order_date     date default sysdate not null,
-   status         varchar2(20) default 'OPEN' not null,
-   total_amount   number(10,2) default 0 not null,
-   constraint pk_orders primary key ( order_id ),
-   constraint fk_orders_customer foreign key ( customer_id )
-      references customer ( customer_id ),
-   constraint fk_orders_employee foreign key ( employee_id )
-      references employee ( employee_id ),
-   constraint fk_orders_table foreign key ( table_id )
-      references restaurant_table ( table_id ),
-   constraint fk_orders_reservation foreign key ( reservation_id )
-      references reservation ( reservation_id ),
-   constraint chk_order_status
-      check ( status in ( 'OPEN',
-                          'CLOSED',
-                          'CANCELLED' ) ),
-   constraint chk_order_total check ( total_amount >= 0 )
+CREATE TABLE Orders (
+    order_id        NUMBER GENERATED ALWAYS AS IDENTITY,
+    customer_id     NUMBER,
+    employee_id     NUMBER NOT NULL,
+    table_id        NUMBER NOT NULL,
+    reservation_id  NUMBER,
+    order_date      DATE DEFAULT SYSDATE NOT NULL,
+    status          VARCHAR2(20) DEFAULT 'OPEN' NOT NULL,
+    total_amount    NUMBER(10,2) DEFAULT 0 NOT NULL,
+    CONSTRAINT pk_orders             PRIMARY KEY (order_id),
+    CONSTRAINT fk_orders_customer    FOREIGN KEY (customer_id)    REFERENCES Customer (customer_id),
+    CONSTRAINT fk_orders_employee    FOREIGN KEY (employee_id)    REFERENCES Employee (employee_id),
+    CONSTRAINT fk_orders_table       FOREIGN KEY (table_id)       REFERENCES Restaurant_table (table_id),
+    CONSTRAINT fk_orders_reservation FOREIGN KEY (reservation_id) REFERENCES Reservation (reservation_id),
+    CONSTRAINT chk_order_status      CHECK (status IN ('OPEN', 'CLOSED', 'CANCELLED')),
+    CONSTRAINT chk_order_total       CHECK (total_amount >= 0)
 );
 
 --------------------------------------------------------------------------------
@@ -182,99 +155,98 @@ create table orders (
 --   unit_price is a snapshot of the menu price at order time (filled
 --   automatically by trg_order_item_before when omitted).
 --------------------------------------------------------------------------------
-create table order_item (
-   order_item_id number generated always as identity,
-   order_id      number not null,
-   menu_item_id  number not null,
-   quantity      number not null,
-   unit_price    number(10,2) not null,
-   constraint pk_order_item primary key ( order_item_id ),
-   constraint fk_order_item_order foreign key ( order_id )
-      references orders ( order_id ),
-   constraint fk_order_item_menu_item foreign key ( menu_item_id )
-      references menu_item ( menu_item_id ),
-   constraint chk_quantity check ( quantity > 0 ),
-   constraint chk_unit_price check ( unit_price > 0 )
+CREATE TABLE Order_item (
+    order_item_id   NUMBER GENERATED ALWAYS AS IDENTITY,
+    order_id        NUMBER NOT NULL,
+    menu_item_id    NUMBER NOT NULL,
+    quantity        NUMBER NOT NULL,
+    unit_price      NUMBER(10,2) NOT NULL,
+    CONSTRAINT pk_order_item           PRIMARY KEY (order_item_id),
+    CONSTRAINT fk_order_item_order     FOREIGN KEY (order_id)     REFERENCES Orders (order_id),
+    CONSTRAINT fk_order_item_menu_item FOREIGN KEY (menu_item_id) REFERENCES Menu_item (menu_item_id),
+    CONSTRAINT chk_quantity            CHECK (quantity > 0),
+    CONSTRAINT chk_unit_price          CHECK (unit_price > 0)
 );
 
 --------------------------------------------------------------------------------
 -- Menu_item_ingredient (recipe). Pure link table, so it may cascade from the
 -- menu item that owns the recipe.
 --------------------------------------------------------------------------------
-create table menu_item_ingredient (
-   menu_item_id  number not null,
-   ingredient_id number not null,
-   qty_required  number(10,2) not null,
-   constraint pk_menu_item_ingredient primary key ( menu_item_id,
-                                                    ingredient_id ),
-   constraint fk_mii_menu_item foreign key ( menu_item_id )
-      references menu_item ( menu_item_id )
-         on delete cascade,
-   constraint fk_mii_ingredient foreign key ( ingredient_id )
-      references ingredient ( ingredient_id ),
-   constraint chk_qty_required check ( qty_required > 0 )
+CREATE TABLE Menu_item_ingredient (
+    menu_item_id    NUMBER NOT NULL,
+    ingredient_id   NUMBER NOT NULL,
+    qty_required    NUMBER(10,2) NOT NULL,
+    CONSTRAINT pk_menu_item_ingredient PRIMARY KEY (menu_item_id, ingredient_id),
+    CONSTRAINT fk_mii_menu_item  FOREIGN KEY (menu_item_id)  REFERENCES Menu_item (menu_item_id) ON DELETE CASCADE,
+    CONSTRAINT fk_mii_ingredient FOREIGN KEY (ingredient_id) REFERENCES Ingredient (ingredient_id),
+    CONSTRAINT chk_qty_required  CHECK (qty_required > 0)
 );
 
 --------------------------------------------------------------------------------
 -- Purchase (stock is increased by trg_purchase_stock)
 --------------------------------------------------------------------------------
-create table purchase (
-   purchase_id   number generated always as identity,
-   supplier_id   number not null,
-   ingredient_id number not null,
-   quantity      number(10,2) not null,
-   unit_cost     number(10,2) not null,
-   purchase_date date default sysdate not null,
-   constraint pk_purchase primary key ( purchase_id ),
-   constraint fk_purchase_supplier foreign key ( supplier_id )
-      references supplier ( supplier_id ),
-   constraint fk_purchase_ingredient foreign key ( ingredient_id )
-      references ingredient ( ingredient_id ),
-   constraint chk_purchase_quantity check ( quantity > 0 ),
-   constraint chk_unit_cost check ( unit_cost > 0 )
+CREATE TABLE Purchase (
+    purchase_id     NUMBER GENERATED ALWAYS AS IDENTITY,
+    supplier_id     NUMBER NOT NULL,
+    ingredient_id   NUMBER NOT NULL,
+    quantity        NUMBER(10,2) NOT NULL,
+    unit_cost       NUMBER(10,2) NOT NULL,
+    purchase_date   DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT pk_purchase            PRIMARY KEY (purchase_id),
+    CONSTRAINT fk_purchase_supplier   FOREIGN KEY (supplier_id)   REFERENCES Supplier (supplier_id),
+    CONSTRAINT fk_purchase_ingredient FOREIGN KEY (ingredient_id) REFERENCES Ingredient (ingredient_id),
+    CONSTRAINT chk_purchase_quantity  CHECK (quantity > 0),
+    CONSTRAINT chk_unit_cost          CHECK (unit_cost > 0)
 );
 
 --------------------------------------------------------------------------------
 -- Payment (no cascade: deleting an order must never delete its payments)
 --------------------------------------------------------------------------------
-create table payment (
-   payment_id number generated always as identity,
-   order_id   number not null,
-   amount     number(10,2) not null,
-   method     varchar2(50) not null,
-   status     varchar2(50) default 'PENDING' not null,
-   paid_at    timestamp,
-   constraint pk_payment primary key ( payment_id ),
-   constraint fk_payment_order foreign key ( order_id )
-      references orders ( order_id ),
-   constraint chk_amount check ( amount > 0 ),
-   constraint chk_payment_method
-      check ( method in ( 'CASH',
-                          'CARD',
-                          'ONLINE' ) ),
-   constraint chk_payment_status
-      check ( status in ( 'PENDING',
-                          'COMPLETED',
-                          'FAILED' ) ),
-   constraint chk_payment_paid_at
-      check ( status <> 'COMPLETED'
-          or paid_at is not null )
+CREATE TABLE Payment (
+    payment_id      NUMBER GENERATED ALWAYS AS IDENTITY,
+    order_id        NUMBER NOT NULL,
+    amount          NUMBER(10,2) NOT NULL,
+    method          VARCHAR2(50) NOT NULL,
+    status          VARCHAR2(50) DEFAULT 'PENDING' NOT NULL,
+    paid_at         TIMESTAMP,
+    CONSTRAINT pk_payment          PRIMARY KEY (payment_id),
+    CONSTRAINT fk_payment_order    FOREIGN KEY (order_id) REFERENCES Orders (order_id),
+    CONSTRAINT chk_amount          CHECK (amount > 0),
+    CONSTRAINT chk_payment_method  CHECK (method IN ('CASH', 'CARD', 'ONLINE')),
+    CONSTRAINT chk_payment_status  CHECK (status IN ('PENDING', 'COMPLETED', 'FAILED')),
+    CONSTRAINT chk_payment_paid_at CHECK (status <> 'COMPLETED' OR paid_at IS NOT NULL)
 );
 
 --------------------------------------------------------------------------------
 -- Logs
---   db_user is the database login that made the change. employee_id is optional
---   and can be filled by the application when it knows which employee acted.
 --------------------------------------------------------------------------------
-create table logs (
-   log_id         number generated always as identity,
-   employee_id    number,
-   action_type    varchar2(50),
-   table_name     varchar2(100),
-   record_id      number,
-   action_details varchar2(500),
-   log_date       date default sysdate,
-   constraint pk_logs primary key ( log_id ),
-   constraint fk_logs_employee foreign key ( employee_id )
-      references employee ( employee_id )
+CREATE TABLE Logs (
+    log_id          NUMBER GENERATED ALWAYS AS IDENTITY,
+    employee_id     NUMBER,
+    action_type     VARCHAR2(50),
+    table_name      VARCHAR2(100),
+    record_id       NUMBER,
+    action_details  VARCHAR2(500),
+    log_date        DATE DEFAULT SYSDATE,
+    CONSTRAINT pk_logs          PRIMARY KEY (log_id),
+    CONSTRAINT fk_logs_employee FOREIGN KEY (employee_id) REFERENCES Employee (employee_id)
 );
+
+--------------------------------------------------------------------------------
+-- Indexes on foreign keys (and common filter columns)
+--------------------------------------------------------------------------------
+CREATE INDEX ix_menu_item_category    ON Menu_item (category_id);
+CREATE INDEX ix_mii_ingredient        ON Menu_item_ingredient (ingredient_id);
+CREATE INDEX ix_reservation_customer  ON Reservation (customer_id);
+CREATE INDEX ix_reservation_table     ON Reservation (table_id, reservation_start);
+CREATE INDEX ix_orders_customer       ON Orders (customer_id);
+CREATE INDEX ix_orders_employee       ON Orders (employee_id);
+CREATE INDEX ix_orders_table          ON Orders (table_id);
+CREATE INDEX ix_orders_reservation    ON Orders (reservation_id);
+CREATE INDEX ix_orders_date           ON Orders (order_date);
+CREATE INDEX ix_order_item_order      ON Order_item (order_id);
+CREATE INDEX ix_order_item_menu_item  ON Order_item (menu_item_id);
+CREATE INDEX ix_purchase_supplier     ON Purchase (supplier_id);
+CREATE INDEX ix_purchase_ingredient   ON Purchase (ingredient_id);
+CREATE INDEX ix_payment_order         ON Payment (order_id);
+CREATE INDEX ix_logs_employee         ON Logs (employee_id);
