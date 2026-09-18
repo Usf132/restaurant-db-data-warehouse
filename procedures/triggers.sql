@@ -45,8 +45,8 @@ AFTER INSERT OR UPDATE OR DELETE ON Order_item
 FOR EACH ROW
 BEGIN
     UPDATE Orders
-    SET TotalAmount = TotalAmount
-                      + NVL(:NEW.quantity * :NEW.unit_price, 0)
+    SET TotalAmount = NVL(TotalAmount, 0)
+    + NVL(:NEW.quantity * :NEW.unit_price, 0)
                       - NVL(:OLD.quantity * :OLD.unit_price, 0)
     WHERE order_id = NVL(:NEW.order_id, :OLD.order_id);
 END;
