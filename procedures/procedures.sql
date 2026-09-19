@@ -1,25 +1,30 @@
 --GetCustomerOrders
 
-create or replace procedure getcustomerorders (
-   p_customer_id in customer.customer_id%type,
-   p_orders      out sys_refcursor
-) as
-begin
-   open p_orders for select o.order_id,
-                            o.customer_id,
-                            o.table_id,
-                            o.emp_d,
-                            o.order_date,
-                            o.order_time,
-                            o.order_statue
-                                         from customer_order o
-                      where o.customer_id = p_customer_id
-                      order by o.order_date desc,
-                               o.order_time desc;
 
-end;
+CREATE OR REPLACE PROCEDURE GetCustomerOrders (
+    p_customer_id IN Customer.customer_id%TYPE,
+    p_orders OUT SYS_REFCURSOR
+)
+AS
+BEGIN
+
+    OPEN p_orders FOR
+        SELECT
+            order_id,
+            customer_id,
+            employee_id,
+            table_id,
+            order_date,
+            status,
+            total_amount
+        FROM Orders
+        WHERE customer_id = p_customer_id
+        ORDER BY order_date DESC;
+
+END;
 
 
+--tst
 
 VARIABLE rc REFCURSOR;
 
@@ -30,139 +35,153 @@ PRINT rc;
 
 --CreateReservation
 
-create or replace procedure createreservation (
-   p_customer_id in reservation.customer_id%type,
-   p_table_id    in reservation.table_d%type,
-   p_reser_date  in reservation.reser_date%type,
-   p_reser_time  in reservation.reser_time%type
-) as
-   v_count number;
-begin
 
-    -- Check if table exists
-   select count(*)
-     into v_count
-     from reservation_table
-    where table_id = p_table_id;
+CREATE OR REPLACE PROCEDURE CreateReservation (
+    p_customer_id       IN Reservation.customer_id%TYPE,
+    p_table_id          IN Reservation.table_id%TYPE,
+    p_reservation_start IN Reservation.reservation_start%TYPE,
+    p_duration_minutes  IN Reservation.duration_minutes%TYPE,
+    p_number_of_guests  IN Reservation.number_of_guests%TYPE
+)
+AS
+    v_count    NUMBER;
+    v_capacity NUMBER;
+BEGIN
 
-   if v_count = 0 then
-      raise_application_error(
-         -20001,
-         'Table does not exist'
-      );
-   end if;
+    SELECT capacity
+    INTO v_capacity
+    FROM Restaurant_table
+    WHERE table_id = p_table_id;
 
-
-    -- Check if table is already reserved
-   select count(*)
-     into v_count
-     from reservation
-    where table_d = p_table_id
-      and reser_date = p_reser_date
-      and reser_time = p_reser_time
-      and statue = 'CONFIRMED';
-
-   if v_count > 0 then
-      raise_application_error(
-         -20002,
-         'Table is already reserved'
-      );
-   end if;
+    IF p_number_of_guests > v_capacity THEN
+        RAISE_APPLICATION_ERROR(
+            -20001,
+            'Number of guests exceeds table capacity'
+        );
+    END IF;
 
 
-    -- Create reservation
-   insert into reservation (
-      reser_d,
-      customer_id,
-      table_d,
-      reser_date,
-      reser_time,
-      statue
-   ) values
-      ( reservation_seq.nextval,
+    SELECT COUNT(*)
+    INTO v_count
+    FROM Reservation
+    WHERE table_id = p_table_id
+      AND status = 'CONFIRMED'
+      AND p_reservation_start <
+          reservation_start +
+          NUMTODSINTERVAL(duration_minutes, 'MINUTE')
+      AND p_reservation_start +
+          NUMTODSINTERVAL(p_duration_minutes, 'MINUTE') >
+          reservation_start;
+
+    IF v_count > 0 THEN
+        RAISE_APPLICATION_ERROR(
+            -20002,
+            'Table is already reserved'
+        );
+    END IF;
+
+
+    INSERT INTO Reservation (
+        customer_id,
+        table_id,
+        reservation_start,
+        duration_minutes,
+        number_of_guests,
+        status
+    )
+    VALUES (
         p_customer_id,
         p_table_id,
-        p_reser_date,
-        p_reser_time,
-        'CONFIRMED' );
+        p_reservation_start,
+        p_duration_minutes,
+        p_number_of_guests,
+        'CONFIRMED'
+    );
 
-end;
+END;
+
+
+--test
+
+
+EXEC CreateReservation(
+    1,
+    2,
+    TIMESTAMP '2026-09-20 19:00:00',
+    90,
+    3
+);
+
 
 
 --ProcessPayment
 
-create or replace procedure processpayment (
-   p_order_id in payment.order_id%type,
-   p_amount   in payment.amount_id%type,
-   p_method   in payment.method%type
-) as
-   v_order_total number;
-   v_paid_total  number;
-begin
-
-    -- Calculate order total
-   select nvl(
-      sum(quantati * unit_price),
-      0
-   )
-     into v_order_total
-     from order_item
-    where order_id = p_order_id;
 
 
-    -- Check order
-   if v_order_total = 0 then
-      raise_application_error(
-         -20003,
-         'Order does not exist or has no items'
-      );
-   end if;
+CREATE OR REPLACE PROCEDURE ProcessPayment (
+    p_order_id IN Payment.order_id%TYPE,
+    p_amount   IN Payment.amount%TYPE,
+    p_method   IN Payment.method%TYPE
+)
+AS
+    v_total_amount NUMBER;
+    v_paid_amount  NUMBER;
+BEGIN
+
+    SELECT total_amount
+    INTO v_total_amount
+    FROM Orders
+    WHERE order_id = p_order_id;
 
 
-    -- Calculate previous payments
-   select nvl(
-      sum(amount_id),
-      0
-   )
-     into v_paid_total
-     from payment
-    where order_id = p_order_id
-      and pay_statue = 'PAID';
+    SELECT NVL(SUM(amount), 0)
+    INTO v_paid_amount
+    FROM Payment
+    WHERE order_id = p_order_id
+      AND status = 'COMPLETED';
 
 
-    -- Prevent overpayment
-   if v_paid_total + p_amount > v_order_total then
-      raise_application_error(
-         -20004,
-         'Payment exceeds order total'
-      );
-   end if;
+    IF v_paid_amount + p_amount > v_total_amount THEN
+        RAISE_APPLICATION_ERROR(
+            -20003,
+            'Payment exceeds remaining balance'
+        );
+    END IF;
 
 
-    -- Insert payment
-   insert into payment (
-      pay_d,
-      order_id,
-      amount_id,
-      pay_statue,
-      pay_date,
-      method
-   ) values
-      ( payment_seq.nextval,
+    INSERT INTO Payment (
+        order_id,
+        amount,
+        method,
+        status,
+        paid_at
+    )
+    VALUES (
         p_order_id,
         p_amount,
-        'PAID',
-        sysdate,
-        p_method );
+        UPPER(p_method),
+        'COMPLETED',
+        SYSTIMESTAMP
+    );
 
 
-    -- If fully paid
-   if v_paid_total + p_amount = v_order_total then
-      update customer_order
-         set
-         order_statue = 'PAID'
-       where order_id = p_order_id;
+    IF v_paid_amount + p_amount = v_total_amount THEN
 
-   end if;
+        UPDATE Orders
+        SET status = 'CLOSED'
+        WHERE order_id = p_order_id;
 
-end;
+    END IF;
+
+END;
+
+
+--test
+
+EXEC ProcessPayment(1, 200, 'CASH');
+
+EXEC ProcessPayment(1, 300, 'CARD');
+
+SELECT order_id, total_amount, status
+FROM Orders
+WHERE order_id = 1;
