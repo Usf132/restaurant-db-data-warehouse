@@ -1,3 +1,6 @@
+--------------------------------------------------------------------------------
+-- GetCustomerOrders
+--------------------------------------------------------------------------------
 CREATE OR REPLACE PROCEDURE GetCustomerOrders (
     p_customer_id IN Customer.customer_id%TYPE,
     p_orders      OUT SYS_REFCURSOR
