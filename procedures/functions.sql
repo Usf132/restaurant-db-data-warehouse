@@ -1,3 +1,4 @@
+-- ORDER TOTAL 
 CREATE OR REPLACE FUNCTION CalculateOrderTotal (
     p_order_id IN NUMBER
 )
@@ -14,6 +15,7 @@ BEGIN
 END;
 /
 
+--VISITS OF A CUSTOMER
 CREATE OR REPLACE FUNCTION GetCustomerVisitCount (
     p_customer_id IN NUMBER
 )
