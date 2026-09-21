@@ -96,7 +96,7 @@ INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (5, 'Tom
 INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (6, 'Pasta', 'KG', 30);
 INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (7, 'Orange', 'KG', 20);
 INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (8, 'Chocolate', 'KG', 15);
-INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (9, 'Sugar', 'KG', 25)
+INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (9, 'Sugar', 'KG', 25);
 INSERT INTO Ingredient (ingredient_id, name, unit, qty_in_stock) VALUES (10, 'Bread', 'PACK', 40);
 
 COMMIT;
@@ -164,7 +164,7 @@ INSERT INTO Reservation (reservation_id, customer_id, table_id, reservation_star
 INSERT INTO Reservation (reservation_id, customer_id, table_id, reservation_start, duration_minutes, number_of_guests, status) VALUES 
        (6, 6, 6, TIMESTAMP '2026-09-23 19:00:00', 90, 4, 'CONFIRMED');
 INSERT INTO Reservation (reservation_id, customer_id, table_id, reservation_start, duration_minutes, number_of_guests, status) VALUES 
-       (7, 7, 7, TIMESTAMP '2026-09-23 20:00:00', 120, 6, 'CONFIRMED')
+       (7, 7, 7, TIMESTAMP '2026-09-23 20:00:00', 120, 6, 'CONFIRMED');
 INSERT INTO Reservation (reservation_id, customer_id, table_id, reservation_start, duration_minutes, number_of_guests, status) VALUES 
        (8, 8, 8, TIMESTAMP '2026-09-24 18:00:00', 90, 7, 'CONFIRMED');
 INSERT INTO Reservation (reservation_id, customer_id, table_id, reservation_start, duration_minutes, number_of_guests, status) VALUES 
