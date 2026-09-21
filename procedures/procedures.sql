@@ -47,10 +47,8 @@ BEGIN
     FROM Reservation
     WHERE table_id = p_table_id
       AND status = 'CONFIRMED'
-      AND p_reservation_start 
-          reservation_start + NUMTODSINTERVAL(duration_minutes, 'MINUTE')
-      AND p_reservation_start +
-          NUMTODSINTERVAL(p_duration_minutes, 'MINUTE') > reservation_start;
+      AND p_reservation_start < reservation_start + NUMTODSINTERVAL(duration_minutes, 'MINUTE')
+      AND p_reservation_start + NUMTODSINTERVAL(p_duration_minutes, 'MINUTE') > reservation_start;
 
     IF v_count > 0 THEN
         RAISE_APPLICATION_ERROR(-20002, 'Table is already reserved');
