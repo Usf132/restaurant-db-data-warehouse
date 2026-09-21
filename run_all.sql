@@ -10,8 +10,8 @@ SET SERVEROUTPUT ON
 @procedures/procedures.sql
 @procedures/triggers.sql
 @database/sample_data.sql
-@data_warehouse/warehouse.sql
-@data_warehouse/analytical_queries.sql
+-- @data_warehouse/warehouse.sql not finished yet
+-- @data_warehouse/analytical_queries.sql not finished yet
 
 PROMPT ============================================
 PROMPT Build complete: OLTP schema + sample data + warehouse
