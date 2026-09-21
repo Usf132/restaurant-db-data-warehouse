@@ -11,6 +11,7 @@ CREATE TABLE Customer (
    is_active       NUMBER(1) DEFAULT 1 NOT NULL,
    CONSTRAINT pk_customer        PRIMARY KEY (customer_id),
    CONSTRAINT uq_customer_email  UNIQUE (email)
+   CONSTRAINT chk_customer_active CHECK (is_active IN (0, 1))
 );
 
 ---------------------
