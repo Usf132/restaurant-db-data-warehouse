@@ -131,6 +131,12 @@ SCD Type 2 columns (`effective_date`, `expiry_date`, `is_current`).
         <sub><b>Abanob-Ayman</b></sub>
       </a>
     </td>
+        <td align="center">
+      <a href="https://github.com/ohanna725">
+        <img src="https://github.com/ohanna725.png" width="80" height="80" alt="ohanna725" /><br />
+        <sub><b>ohanna725</b></sub>
+      </a>
+    </td>
   </tr>
 </table>
 
