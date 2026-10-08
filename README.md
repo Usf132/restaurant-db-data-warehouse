@@ -92,12 +92,13 @@ run by `run_all.sql`, and `analytical_queries.sql` is still empty.
 ## Data warehouse
 
 Star schema for reporting: five fact tables at different grains
-(`fact_order_item`, `fact_payment`, `fact_reservation`, `fact_purchase`,
-`fact_inventory_snapshot`), surrounded by conformed dimensions
-(`dim_date`, `dim_time`, `dim_customer`, `dim_employee`, `dim_table`,
-`dim_menu_item`, `dim_ingredient`, `dim_supplier`, `dim_payment`).
-`dim_customer`, `dim_employee`, and `dim_menu_item` track history with
-SCD Type 2 columns (`effective_date`, `expiry_date`, `is_current`).
+`(fact_order_item, fact_payment, fact_reservation, fact_purchase,
+fact_inventory_snapshot)`, supported by conformed dimensions
+`(dim_date, dim_time, dim_customer, dim_employee, dim_table,
+dim_menu_item, dim_ingredient, dim_supplier, dim_payment)`.
+`dim_customer, dim_employee, and dim_menu_item` use SCD Type 2 to
+preserve history with `effective_date, expiry_date, and is_current`.
+
 
 ![Warehouse ERD](data_warehouse/restaurant_data_warehouse_erd.png)
 
