@@ -29,7 +29,7 @@ Oracle to generate them instead.
 
 ## OLTP entity relationship diagram
 
-![Restaurant OLTP ERD](ERD/restaurant_erp_database_erd.png)
+![Restaurant OLTP ERD](data_warehouse/restaurant_erp_database_erd.png)
 
 ## Setup (SQL*Plus or SQLcl, in this order)
 
