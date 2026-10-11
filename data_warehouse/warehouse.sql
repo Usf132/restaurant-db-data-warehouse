@@ -11,10 +11,26 @@ Table dim_date {
   year_number int
   is_weekend int
   is_holiday int
-  time_key int [pk]
+  time_key int
   hour_24 int
   day_part varchar
 }
+
+Table dim_payment {
+  payment_key int [pk]
+  method varchar
+  status varchar
+}
+
+Table dim_ingredient {
+  ingredient_key int [pk]
+  ingredient_id int
+  ingredient_name varchar
+  unit varchar
+  supplier_key int
+  menu_item_key int
+}
+
 Table dim_customer {
   customer_key int [pk]
   customer_id int
@@ -33,6 +49,26 @@ Table dim_customer {
   effective_date date
   expiry_date date
   is_current int
+}
+
+Table dim_supplier {
+  supplier_key int [pk]
+  supplier_id int
+  supplier_name varchar
+  contact_person varchar
+  phone varchar
+  email varchar
+  address varchar
+}
+
+Table dim_menu_item {
+  menu_item_key int [pk]
+  menu_item_id int
+  item_name varchar
+  category_id int
+  category_name varchar
+  current_price decimal
+  is_active int
 }
 
 Table dim_employee {
@@ -58,43 +94,7 @@ Table dim_employee {
   is_current int
 }
 
-
-
-Table dim_payment {
-  payment_key int [pk]
-  method varchar
-  status varchar
-}
-
-Table dim_menu_item {
-  menu_item_key int [pk]
-  menu_item_id int
-  item_name varchar
-  category_id int
-  category_name varchar
-  current_price decimal
-  is_active int
-}
-
-Table dim_ingredient {
-  ingredient_key int [pk]
-  ingredient_id int
-  ingredient_name varchar
-  unit varchar
-}
-
-Table dim_supplier {
-  supplier_key int [pk]
-  supplier_id int
-  supplier_name varchar
-  contact_person varchar
-  phone varchar
-  email varchar
-  address varchar
-}
-
-
-Table fact_order_item  [headercolor: #E24B4A] {
+Table fact_order_item {
   order_item_fact_key int [pk]
   date_key int
   customer_key int
@@ -115,14 +115,7 @@ Ref: fact_order_item.date_key > dim_date.date_key
 Ref: fact_order_item.customer_key > dim_customer.customer_key
 Ref: fact_order_item.employee_key > dim_employee.employee_key
 Ref: fact_order_item.menu_item_key > dim_menu_item.menu_item_key
-Ref: fact_order_item.menu_item_key > dim_ingredient.ingredient_key
-Ref: fact_order_item.menu_item_key > dim_supplier.supplier_key
-Ref: fact_order_item.menu_item_key > dim_payment.payment_key
+Ref: fact_order_item.payment_key > dim_payment.payment_key
 
-
-Ref: "dim_employee"."employee_key" ?<? "dim_employee"."phone"
-
-Ref: "dim_date"."date_key" ?<>? "dim_date"."day_of_week"
-
-Ref: "dim_ingredient"."ingredient_key" ?<? "dim_ingredient"."ingredient_name"Ref: fact_inventory_snapshot.date_key > dim_date.date_key
-Ref: fact_inventory_snapshot.ingredient_key > dim_ingredient.ingredient_key
+Ref: dim_ingredient.supplier_key > dim_supplier.supplier_key
+Ref: dim_ingredient.menu_item_key > dim_menu_item.menu_item_keygredient_key > dim_ingredient.ingredient_key
