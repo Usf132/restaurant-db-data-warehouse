@@ -29,7 +29,7 @@ Oracle to generate them instead.
 
 ## OLTP entity relationship diagram
 
-![Restaurant OLTP ERD](data_warehouse/restaurant_erp_database_erd.png)
+![Restaurant OLTP ERD](ERD/restaurant_erp_database_erd.png)
 
 ## Setup (SQL*Plus or SQLcl, in this order)
 
@@ -100,7 +100,7 @@ dim_menu_item, dim_ingredient, dim_supplier, dim_payment)`.
 preserve history with `effective_date, expiry_date, and is_current`.
 
 
-![Warehouse ERD](data_warehouse/restaurant_data_warehouse_erd.png)
+![Warehouse ERD](data_warehouse/Restaurant_Datawarehouse.png)
 
 ---
 
